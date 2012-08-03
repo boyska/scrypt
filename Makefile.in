@@ -268,12 +268,20 @@ scrypt$(EXEEXT): $(scrypt_OBJECTS) $(scrypt_DEPENDENCIES)
 	@rm -f scrypt$(EXEEXT)
 	$(scrypt_LINK) $(scrypt_OBJECTS) $(scrypt_LDADD) $(LIBS)
 
-hash: hash.o $(scrypt_OBJECTS) $(scrypt_DEPENDENCIES) 
-	$(scrypt_LINK) hash.o scrypt-memlimit.o scrypt-readpass.o scrypt-warn.o scrypt-scryptenc.o scrypt-scryptenc_cpuperf.o scrypt-crypto_aesctr.o scrypt-sha256.o scrypt-crypto_scrypt-nosse.o $(scrypt_LDADD) $(LIBS)
+hash: hash.o base64.o $(scrypt_OBJECTS) $(scrypt_DEPENDENCIES) 
+	$(scrypt_LINK) hash.o base64.o scrypt-memlimit.o scrypt-readpass.o scrypt-warn.o scrypt-scryptenc.o scrypt-scryptenc_cpuperf.o scrypt-crypto_aesctr.o scrypt-sha256.o scrypt-crypto_scrypt-nosse.o $(scrypt_LDADD) $(LIBS)
 
 hash.o: hash.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(scrypt_CFLAGS) $(CFLAGS) -c -o hash.o `test -f 'hash.c' || echo '$(srcdir)/'`hash.c
 
+base64.o: base64.c base64.h
+	$(CC) $(CFLAGS) -c -o base64.o `test -f base64.c || echo $(srcdir)/`base64.c
+
+base64_test.o: base64_test.c
+	$(CC) $(CFLAGS) -c -o base64_test.o `test -f base64_test.c || echo $(srcdir)/`base64_test.c
+
+base64_test: base64.o base64_test.o
+	$(scrypt_LINK)	base64.o base64_test.o -o base64_test
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)

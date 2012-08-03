@@ -11,6 +11,7 @@
 
 #include "scryptenc.h"
 #include "warn.h"
+#include "base64.h"
 
 //TODO: separate into a clean calculate_pass(passwd, passwdlen, N, r, p, salt, saltlen) <-- this is crypto_scrypt !!
 //TODO: design a useful interface!
@@ -26,11 +27,12 @@ int main(int argc, char *argv[]) {
 	double maxmemfrac = 0.5;
 	double maxtime = 10.0;
 	int rc;
-	uint8_t salt[32];
+	uint8_t *salt;
 	uint8_t dk[64]; //derived key
 	uint8_t passwd[4];
-	char *saltfile = "salt";
+	char *salt_encoded = NULL;
 	FILE *f;
+	char *dk_be64;
 
 	int count;
 	for(count=0; count < 4; count++)
@@ -52,25 +54,25 @@ int main(int argc, char *argv[]) {
 	N = (uint64_t)(1) << logN;
 
 	fprintf(stderr, "Param:\t%d=>%lu %" PRIu32 " %" PRIu32 "\n", logN, N, r, p);
+	//TODO: stop saltfile madness! we want a base64encoding as a parameter!
 	if(argc >= 5) {
-		printf("Reading saltfile...\n");
-		sscanf(argv[4], "%ms", &saltfile);
+		printf("Reading salt base64 encoding...\n");
+		sscanf(argv[4], "%ms", &salt_encoded);
 	}
-	printf("Salt file is: %s\n", saltfile);
-	if(argc<2) { //TODO: change in exists()
+	if(salt_encoded) { //got salt as input
+		if(be64_decode(salt_encoded, &salt) < 32) {
+			fprintf(stderr, "Error: your salt is too short, this is not secure. Please provide 32bytes of salt");
+			return 12;
+		}
+		free(salt_encoded);
+
+	} else {
+		salt = calloc(32, sizeof(uint8_t));
 		if ((rc = getsalt(salt)) != 0)
 			return (rc);
-		f = fopen("salt", "w");
-		fwrite(salt, sizeof(uint8_t), 32, f);
-		fclose(f);
-	} else {
-/*        printf("Loading salt...\n");*/
-		f = fopen("salt", "r");
-		if(fread(salt, sizeof(uint8_t), 32, f) != 32) {
-			fprintf(stderr, "Error reading salt\n");
-			return 1;
-		}
-		fclose(f);
+		be64_encode(salt, 32, &salt_encoded, 0);
+		printf("Salt is (encoded): %s\n---\n", salt_encoded);
+		free(salt_encoded);
 	}
 
 /*    printf("Salt is: ");*/
@@ -86,13 +88,10 @@ int main(int argc, char *argv[]) {
 	//NOTA: il dk sono 64 byte: 32 sono la chiave, altri 32 un hmac!
 	if (crypto_scrypt(passwd, (size_t)4, salt, 32, N, r, p, dk, 64))
 		return (3);
-	f = fopen("dk", "w");
-	fwrite(dk, sizeof(uint8_t), 32, f); //il resto non ci serve!
-	fclose(f);
-	printf("derived key is...\n");
-	for(count=0; count < 32; count++)
-		printf("%02x ", dk[count]);
-	printf("\n\n");
+	free(salt);
+	be64_encode(dk, 32, &dk_be64, 0);
+	printf("derived key is...%s", dk_be64);
+	free(dk_be64);
 	printf("\nDone! security is now f***ed up\n");
 	return 0;
 }
