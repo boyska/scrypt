@@ -268,6 +268,13 @@ scrypt$(EXEEXT): $(scrypt_OBJECTS) $(scrypt_DEPENDENCIES)
 	@rm -f scrypt$(EXEEXT)
 	$(scrypt_LINK) $(scrypt_OBJECTS) $(scrypt_LDADD) $(LIBS)
 
+hash: hash.o $(scrypt_OBJECTS) $(scrypt_DEPENDENCIES) 
+	$(scrypt_LINK) hash.o scrypt-memlimit.o scrypt-readpass.o scrypt-warn.o scrypt-scryptenc.o scrypt-scryptenc_cpuperf.o scrypt-crypto_aesctr.o scrypt-sha256.o scrypt-crypto_scrypt-nosse.o $(scrypt_LDADD) $(LIBS)
+
+hash.o: hash.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(scrypt_CFLAGS) $(CFLAGS) -c -o hash.o `test -f 'hash.c' || echo '$(srcdir)/'`hash.c
+
+
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
 
