@@ -110,3 +110,8 @@ int scryptdec_file(FILE *, FILE *, const uint8_t *, size_t,
     size_t, double, double);
 
 #endif /* !_SCRYPTENC_H_ */
+
+int pickparams(size_t, double, double,
+    int *, uint32_t *, uint32_t *);
+int checkparams(size_t, double, double, int, uint32_t, uint32_t);
+int getsalt(uint8_t[32]);

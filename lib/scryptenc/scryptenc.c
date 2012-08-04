@@ -48,12 +48,7 @@
 
 #define ENCBLOCK 65536
 
-static int pickparams(size_t, double, double,
-    int *, uint32_t *, uint32_t *);
-static int checkparams(size_t, double, double, int, uint32_t, uint32_t);
-static int getsalt(uint8_t[32]);
-
-static int
+int
 pickparams(size_t maxmem, double maxmemfrac, double maxtime,
     int * logN, uint32_t * r, uint32_t * p)
 {
@@ -120,7 +115,7 @@ pickparams(size_t maxmem, double maxmemfrac, double maxtime,
 	return (0);
 }
 
-static int
+int
 checkparams(size_t maxmem, double maxmemfrac, double maxtime,
     int logN, uint32_t r, uint32_t p)
 {
@@ -156,7 +151,7 @@ checkparams(size_t maxmem, double maxmemfrac, double maxtime,
 	return (0);
 }
 
-static int
+int
 getsalt(uint8_t salt[32])
 {
 	int fd;
