@@ -30,7 +30,7 @@ POST_INSTALL = :
 NORMAL_UNINSTALL = :
 PRE_UNINSTALL = :
 POST_UNINSTALL = :
-bin_PROGRAMS = scrypt$(EXEEXT)
+bin_PROGRAMS = scrypt$(EXEEXT) stretcher
 subdir = .
 DIST_COMMON = $(am__configure_deps) $(dist_man_MANS) \
 	$(srcdir)/Makefile.am $(srcdir)/Makefile.in \
@@ -268,11 +268,11 @@ scrypt$(EXEEXT): $(scrypt_OBJECTS) $(scrypt_DEPENDENCIES)
 	@rm -f scrypt$(EXEEXT)
 	$(scrypt_LINK) $(scrypt_OBJECTS) $(scrypt_LDADD) $(LIBS)
 
-hash: hash.o base64.o $(scrypt_OBJECTS) $(scrypt_DEPENDENCIES) 
-	$(scrypt_LINK) hash.o base64.o scrypt-memlimit.o scrypt-readpass.o scrypt-warn.o scrypt-scryptenc.o scrypt-scryptenc_cpuperf.o scrypt-crypto_aesctr.o scrypt-sha256.o scrypt-crypto_scrypt-nosse.o $(scrypt_LDADD) $(LIBS)
+stretcher: stretcher.o base64.o $(scrypt_OBJECTS) $(scrypt_DEPENDENCIES) 
+	$(scrypt_LINK) stretcher.o base64.o scrypt-memlimit.o scrypt-readpass.o scrypt-warn.o scrypt-scryptenc.o scrypt-scryptenc_cpuperf.o scrypt-crypto_aesctr.o scrypt-sha256.o scrypt-crypto_scrypt-nosse.o $(scrypt_LDADD) $(LIBS)
 
-hash.o: hash.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(scrypt_CFLAGS) $(CFLAGS) -c -o hash.o `test -f 'hash.c' || echo '$(srcdir)/'`hash.c
+stretcher.o: stretcher.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(scrypt_CFLAGS) $(CFLAGS) -c -o stretcher.o `test -f 'stretcher.c' || echo '$(srcdir)/'`stretcher.c
 
 base64.o: base64.c base64.h
 	$(CC) $(CFLAGS) -c -o base64.o `test -f base64.c || echo $(srcdir)/`base64.c
