@@ -51,9 +51,12 @@ int main(int argc, char *argv[]) {
 			&logN, &r, &p)) != 0)
 			return (rc);
 		salt = calloc(32, sizeof(uint8_t));
-		if ((rc = getsalt(salt)) != 0)
+		if ((rc = getsalt(salt)) != 0) {
+			free (salt);
 			return (rc);
+		}
 		be64_encode(salt, 32, &salt_encoded, 0);
+		free(salt);
 		printf("%d\n%" PRIu32 "\n%" PRIu32 "\n", logN, r, p);
 		printf("%s\n", salt_encoded);
 		free(salt_encoded);
@@ -96,8 +99,11 @@ int main(int argc, char *argv[]) {
 	//NOTA: il dk sono 64 byte: 32 sono la chiave, altri 32 un hmac!
 	if (crypto_scrypt(passwd, (size_t)4, salt, 32, N, r, p, dk, 64))
 		return (3);
+	memset(passwd, 0, strlen(passwd)); /* for security */
+	free(passwd);
 	free(salt);
 	be64_encode(dk, 32, &dk_be64, 0);
+	memset(dk, 0, 64);
 	printf("%s", dk_be64);
 	free(dk_be64);
 	return 0;
